@@ -35,6 +35,7 @@ import android.animation.Animator
 import android.animation.AnimatorListenerAdapter
 import android.animation.AnimatorSet
 import android.animation.ObjectAnimator
+import android.arch.lifecycle.Observer
 import android.arch.lifecycle.ViewModelProviders
 import android.graphics.Color
 import android.os.Bundle
@@ -62,21 +63,31 @@ class StarActivity : AppCompatActivity() {
     starViewModel = ViewModelProviders.of(this).get(StarViewModel::class.java)
 
     setupButtons()
+
+    starViewModel.starLiveData.observe(this, Observer { star ->
+      animateStar(star)
+    })
+
+    starViewModel.emittingLiveData.observe(this, Observer { emitting ->
+      resetButton.isEnabled = emitting ?: false
+      startButton.isEnabled = !resetButton.isEnabled
+    })
+
   }
 
   private fun setupButtons() {
     startButton.setOnClickListener {
       starViewModel.startEmittingStars()
-      resetButton.isEnabled = true
-      startButton.isEnabled = false
+//      resetButton.isEnabled = true
+//      startButton.isEnabled = false
     }
 
     resetButton.setOnClickListener {
       starViewModel.stopEmittingStars()
       starViews.forEach { starField.removeView(it) }
       starViews.clear()
-      resetButton.isEnabled = false
-      startButton.isEnabled = true
+//      resetButton.isEnabled = false
+//      startButton.isEnabled = true
     }
   }
 
